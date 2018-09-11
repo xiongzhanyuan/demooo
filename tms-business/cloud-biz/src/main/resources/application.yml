@@ -1,0 +1,71 @@
+eureka:
+    instance:
+      statusPageUrlPath: /actuator/info
+      healthCheckUrlPath: /actuator/health
+      home-page-url-path: /
+      instance-id:
+      # docker 部署开启
+  #        prefer-ip-address: true
+  #        ip-address: 127.0.0.1
+      lease-expiration-duration-in-seconds: 15  #服务过期时间配置,超过这个时间没有接收到心跳EurekaServer就会将这个实例剔除
+  #注意，EurekaServer一定要设置eureka.server.eviction-interval-timer-in-ms否则这个配置无效，这个配置一般为服务刷新时间配置的三倍
+  #默认90s
+      lease-renewal-interval-in-seconds: 5  #服务刷新时间配置，每隔这个时间会主动心跳一次
+    client:
+        serviceUrl:
+#            defaultZone: http://localhost:8761/eureka/
+                    # docker 部署开启
+            defaultZone: http://${EUREKA_HOST:127.0.0.1}:${EUREKA_PORT:8761}/eureka/
+
+
+spring:
+  application:
+    name: cloud-biz
+  jackson:
+    date-format: yyyy-MM-dd HH:mm:ss
+    time-zone: GMT+8
+    default-property-inclusion: non_null
+  datasource:
+    druid:
+      url: jdbc:mysql://127.0.0.1:3306/tms?characterEncoding=utf-8&useSSL=false&autoReconnect=true&rewriteBatchedStatements=true
+      username: root
+      password: yueshen521
+      driver-class-name: com.mysql.jdbc.Driver
+      initial-size: 5
+      min-idle: 5
+      max-active: 20
+      max-wait: 60000
+      time-between-eviction-runs-millis: 60000
+      min-evictable-idle-time-millis: 300000
+      validation-query: SELECT 1 FROM DUAL
+      test-while-idle: true
+      test-on-borrow: false
+      test-on-return: false
+      pool-prepared-statements: true
+      max-pool-prepared-statement-per-connection-size: 20
+      filters: stat,wall,slf4j
+      connection-properties: druid.stat.mergeSql=true;druid.stat.slowSqlMillis=5000
+  rabbitmq:
+    host: 172.16.10.147
+    username: admin
+    password: admin
+  # 热部署配置开启
+  devtools:
+    restart:
+      enabled: true
+mybatis-plus:
+  mapper-locations:  classpath:**/mapper/**/*.xml
+  global-config:
+    db-config:
+      column-underline: true
+  configuration:
+    map-underscore-to-camel-case: true
+auth:
+  user:
+    token-header: Authorization
+ribbon:
+  ReadTimeout: 120000
+  ConnectTimeout: 120000
+
+
+

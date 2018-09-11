@@ -1,0 +1,44 @@
+server:
+  port: 8765
+
+eureka:
+    instance:
+        statusPageUrlPath: /actuator/info
+        healthCheckUrlPath: /actuator/health
+        home-page-url-path: /
+        instance-id:
+        # docker 部署开启
+#        prefer-ip-address: true
+#        ip-address: 127.0.0.1
+    client:
+        serviceUrl:
+#            defaultZone: http://localhost:8761/eureka/
+                    # docker 部署开启
+            defaultZone: http://${EUREKA_HOST:127.0.0.1}:${EUREKA_PORT:8761}/eureka/
+ribbon:
+  ReadTimeout: 120000
+  ConnectTimeout: 120000
+
+spring:
+  application:
+      name: tms-gateway
+  cloud:
+    gateway:
+      discovery:
+        locator:
+          enabled: true
+      routes:
+        - id: cloud-biz
+          uri: lb://cloud-biz
+          order: 8000
+          predicates:
+            - Path=/api/biz/**
+          filters:
+           - StripPrefix=2
+        - id: cloud-smp
+          uri: lb://cloud-smp
+          order: 8000
+          predicates:
+            - Path=/api/smp/**
+          filters:
+           - StripPrefix=2
